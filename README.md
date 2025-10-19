@@ -39,7 +39,7 @@ docker-compose up -d --build
 {
   "mcpServers": {
     "bitbucket": {
-      "url": "http://localhost:8000/sse"
+      "url": "http://localhost:9000/sse"
     }
   }
 }
@@ -70,7 +70,7 @@ docker-compose down
 ```bash
 docker run -d \
   --name mcp-bitbucket \
-  -p 8000:8000 \
+  -p 9000:9000 \
   -e BITBUCKET_USERNAME=your_username \
   -e BITBUCKET_PASSWORD=your_app_password \
   -e BITBUCKET_WORKSPACE=your_workspace \
@@ -82,7 +82,7 @@ docker run -d \
 
 Verify the server is running:
 ```bash
-curl http://localhost:8000/sse
+curl http://localhost:9000/sse
 ```
 
 #### Container Management

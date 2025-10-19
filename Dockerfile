@@ -23,12 +23,12 @@ RUN useradd -m -u 1000 mcp && \
 USER mcp
 
 # Expose port for HTTP/SSE transport
-EXPOSE 8000
+EXPOSE 9000
 
 # Use SSE transport by default for Docker
 ENV MCP_TRANSPORT=sse
 ENV MCP_HOST=0.0.0.0
-ENV MCP_PORT=8000
+ENV MCP_PORT=9000
 
 # Set entrypoint to the CLI command
 ENTRYPOINT ["mcp-bitbucket"]

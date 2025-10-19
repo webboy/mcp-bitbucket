@@ -382,7 +382,7 @@ class BitbucketMcpServer:
         """Run server with stdio transport."""
         await self._server.run_stdio_async()
 
-    async def run_sse(self, host: str = "0.0.0.0", port: int = 8000) -> None:
+    async def run_sse(self, host: str = "0.0.0.0", port: int = 9000) -> None:
         """Run server with SSE (HTTP) transport."""
         from mcp.server.sse import SseServerTransport
         import uvicorn

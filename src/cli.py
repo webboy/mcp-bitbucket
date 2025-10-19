@@ -22,8 +22,8 @@ def main() -> None:
     parser.add_argument(
         "--port",
         type=int,
-        default=int(os.getenv("MCP_PORT", "8000")),
-        help="Port for SSE transport (default: 8000, or MCP_PORT env var)",
+        default=int(os.getenv("MCP_PORT", "9000")),
+        help="Port for SSE transport (default: 9000, or MCP_PORT env var)",
     )
     parser.add_argument(
         "--host",
