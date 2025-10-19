@@ -17,6 +17,99 @@ Recommended scopes for App Password (adjust to your needs):
 uv pip install -e .
 ```
 
+### Docker Usage (HTTP/SSE Transport)
+
+The MCP server runs in a Docker container using HTTP/SSE transport, allowing a single long-running container that handles multiple Cursor connections.
+
+#### Quick Start
+
+1. **Create environment file:**
+```bash
+cp .env.example .env
+# Edit .env with your Bitbucket credentials
+```
+
+2. **Build and start the container:**
+```bash
+docker-compose up -d --build
+```
+
+3. **Configure Cursor** (`~/.cursor/mcp.json`):
+```json
+{
+  "mcpServers": {
+    "bitbucket": {
+      "url": "http://localhost:8000/sse"
+    }
+  }
+}
+```
+
+4. **Restart Cursor** - The Bitbucket MCP server should now be available!
+
+#### Manual Docker Commands
+
+**Build the image:**
+```bash
+docker build -t mcp-bitbucket:latest .
+```
+
+**Run with docker-compose:**
+```bash
+# Start in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
+```
+
+**Run with docker directly:**
+```bash
+docker run -d \
+  --name mcp-bitbucket \
+  -p 8000:8000 \
+  -e BITBUCKET_USERNAME=your_username \
+  -e BITBUCKET_PASSWORD=your_app_password \
+  -e BITBUCKET_WORKSPACE=your_workspace \
+  -e MCP_TRANSPORT=sse \
+  mcp-bitbucket:latest
+```
+
+#### Health Check
+
+Verify the server is running:
+```bash
+curl http://localhost:8000/sse
+```
+
+#### Container Management
+
+```bash
+# Check if running
+docker ps | grep mcp-bitbucket
+
+# View logs
+docker logs mcp-bitbucket
+
+# Restart
+docker restart mcp-bitbucket
+
+# Stop and remove
+docker stop mcp-bitbucket
+docker rm mcp-bitbucket
+```
+
+#### Benefits of HTTP/SSE Transport
+
+- **Single container**: One long-running container handles all requests
+- **Multiple connections**: Cursor can connect/reconnect without spawning new containers
+- **Better performance**: No container startup overhead per request
+- **Easier debugging**: View logs with `docker logs`
+- **Health monitoring**: Built-in health checks
+
 ### Configuration
 Environment variables:
 - BITBUCKET_URL: defaults to `https://api.bitbucket.org/2.0`
@@ -44,7 +137,12 @@ uv run --with mcp mcp dev src/app.py --with-editable .
 ```
 Open the printed URL and call tools like `health` and `listRepositories`.
 
-### Use with Cursor
+### Use with Cursor (Native/Development)
+
+#### Option 1: Docker (Recommended for Production)
+See [Docker Usage](#docker-usage) section above.
+
+#### Option 2: Direct UV (for Development)
 If Cursor runs inside the same Ubuntu WSL2 environment, prefer an absolute path to `uv` and add editable source to ensure the local tree is used:
 ```json
 {
@@ -54,15 +152,17 @@ If Cursor runs inside the same Ubuntu WSL2 environment, prefer an absolute path 
       "args": ["run", "--with-editable", "/home/nemanja/projects/mcp/mcp-bitbucket", "mcp-bitbucket"],
       "env": {
         "BITBUCKET_URL": "https://api.bitbucket.org/2.0",
-        "BITBUCKET_USERNAME": "<user>",
-        "BITBUCKET_PASSWORD": "<app_password>",
-        "BITBUCKET_WORKSPACE": "<workspace>",
+        "BITBUCKET_USERNAME": "your_username",
+        "BITBUCKET_PASSWORD": "your_app_password",
+        "BITBUCKET_WORKSPACE": "your_workspace",
         "FASTMCP_LOG_LEVEL": "DEBUG"
       }
     }
   }
 }
 ```
+
+#### Option 3: WSL Bridge (Windows)
 If Cursor runs on Windows (outside WSL), bridge to WSL via:
 ```json
 {
@@ -71,7 +171,7 @@ If Cursor runs on Windows (outside WSL), bridge to WSL via:
       "command": "wsl",
       "args": [
         "bash", "-lc",
-        "cd /home/<user>/projects/mcp/mcp-bitbucket && BITBUCKET_USERNAME='<user>' BITBUCKET_PASSWORD='<app_password>' BITBUCKET_WORKSPACE='<workspace>' /home/<user>/.local/bin/uv run mcp-bitbucket"
+        "cd /home/<user>/projects/mcp/mcp-bitbucket && BITBUCKET_USERNAME='your_username' BITBUCKET_PASSWORD='your_app_password' BITBUCKET_WORKSPACE='your_workspace' /home/<user>/.local/bin/uv run mcp-bitbucket"
       ]
     }
   }

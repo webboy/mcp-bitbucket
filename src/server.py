@@ -379,7 +379,46 @@ class BitbucketMcpServer:
             return self.tool_health(workspace=workspace)
 
     async def run_stdio(self) -> None:
+        """Run server with stdio transport."""
         await self._server.run_stdio_async()
+
+    async def run_sse(self, host: str = "0.0.0.0", port: int = 8000) -> None:
+        """Run server with SSE (HTTP) transport."""
+        from mcp.server.sse import SseServerTransport
+        import uvicorn
+
+        sse = SseServerTransport("/messages")
+
+        async def app(scope, receive, send):
+            """ASGI application that routes SSE requests."""
+            if scope["type"] == "http":
+                path = scope["path"]
+                method = scope["method"]
+                
+                if path == "/sse" and method == "GET":
+                    # Handle SSE connection
+                    async with sse.connect_sse(scope, receive, send) as streams:
+                        await self._server._mcp_server.run(
+                            streams[0], streams[1], self._server._mcp_server.create_initialization_options()
+                        )
+                elif path == "/messages" and method == "POST":
+                    # Handle POST messages
+                    await sse.handle_post_message(scope, receive, send)
+                else:
+                    # 404 for other paths
+                    await send({
+                        "type": "http.response.start",
+                        "status": 404,
+                        "headers": [[b"content-type", b"text/plain"]],
+                    })
+                    await send({
+                        "type": "http.response.body",
+                        "body": b"Not Found",
+                    })
+
+        config = uvicorn.Config(app, host=host, port=port, log_level="info")
+        server = uvicorn.Server(config)
+        await server.serve()
 
     def _safe(self, func: Callable[[], Dict[str, Any]]) -> Dict[str, Any]:
         """Execute a tool function and convert any exception into a consistent MCP text response.

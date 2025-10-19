@@ -1,0 +1,45 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# UV lock file (will be regenerated)
+uv.lock
+
+# Documentation and memory bank
+memory-bank/
+LICENSE
+
+# JavaScript reference implementation
+js/
+
+# Tests and examples
+tests/
+examples/
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml
+.env
+.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
