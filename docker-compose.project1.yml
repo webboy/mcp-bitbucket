@@ -1,0 +1,35 @@
+services:
+  mcp-bitbucket-project1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-bitbucket:latest
+    container_name: mcp-bitbucket-project1
+    
+    # Expose HTTP port
+    ports:
+      - "9000:9000"
+    
+    # Environment variables for Project 1
+    env_file:
+      - .env.project1
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/sse"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+

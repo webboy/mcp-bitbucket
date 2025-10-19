@@ -110,6 +110,51 @@ docker rm mcp-bitbucket
 - **Easier debugging**: View logs with `docker logs`
 - **Health monitoring**: Built-in health checks
 
+#### Multi-Project Setup
+
+If you work on multiple projects with different Bitbucket credentials, you can run multiple containers:
+
+**Setup:**
+1. Create project-specific env files:
+```bash
+cp .env.project1.example .env.project1
+cp .env.project2.example .env.project2
+# Edit each with the appropriate credentials
+```
+
+2. Start both containers:
+```bash
+docker compose -f docker-compose.project1.yml up -d
+docker compose -f docker-compose.project2.yml up -d
+```
+
+3. Configure Cursor with both servers:
+```json
+{
+  "mcpServers": {
+    "bitbucket-project1": {
+      "url": "http://localhost:9000/sse"
+    },
+    "bitbucket-project2": {
+      "url": "http://localhost:9001/sse"
+    }
+  }
+}
+```
+
+**Management:**
+```bash
+# Start all projects
+docker compose -f docker-compose.project1.yml up -d
+docker compose -f docker-compose.project2.yml up -d
+
+# Stop specific project
+docker compose -f docker-compose.project1.yml down
+
+# View logs for specific project
+docker compose -f docker-compose.project1.yml logs -f
+```
+
 ### Configuration
 Environment variables:
 - BITBUCKET_URL: defaults to `https://api.bitbucket.org/2.0`
